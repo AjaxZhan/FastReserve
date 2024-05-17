@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: gpu-mysql
+    ports:
+      - "7779:3306"
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: gpu_monitor_7779
+    volumes:
+      - "./mysql/conf:/etc/mysql/conf.d"
+      - "./mysql/data:/var/lib/mysql"
+      - "./mysql/init:/docker-entrypoint-initdb.d"
+    networks:
+      - gpu-monitor-net
+  redis:
+    image: redis
+    container_name: gpu-redis
+    ports:
+      - "7776:6379"
+    networks:
+      - gpu-monitor-net
+  gpu-java:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: gpu-java
+    ports:
+      - "7777:7777"
+    networks:
+      - gpu-monitor-net
+    depends_on:
+      - mysql
+      - redis
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "8090:80"
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx/html:/usr/share/nginx/html"
+    depends_on:
+      - gpu-java
+    networks:
+      - gpu-monitor-net
+networks:
+  gpu-monitor-net:
+    name: gpu-java
+    
