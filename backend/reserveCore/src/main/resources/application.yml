@@ -1,0 +1,19 @@
+# 服务器信息
+server:
+  port: 7777
+# 配置生产环境和开发环境
+spring:
+  profiles:
+    active: prod
+# ORM
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 逻辑删除
+      logic-delete-field: delFlag
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+      # 主键自增
+      id-type: auto

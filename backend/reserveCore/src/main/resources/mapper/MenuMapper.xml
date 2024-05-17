@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.cagurzhan.mapper.MenuMapper">
+    <select id="selectPermsByUserId" resultType="java.lang.String">
+        select perms
+        from tb_user_role ur
+            left join tb_role_menu rm
+                on ur.role_id=rm.role_id
+            left join tb_menu m
+                on m.id=rm.menu_id
+        where ur.user_id=#{userId} AND m.menu_type in('M','C') AND m.del_flag=0
+    </select>
+    <select id="selectRouterMenuTreeByUserId" resultType="cn.cagurzhan.entity.Menu">
+        select
+            distinct m.id,m.parent_id,m.menu_name,m.order_num,m.path,m.component,m.menu_type,IFNULL(m.perms,'') AS perms,m.icon
+        from tb_user_role ur
+                 left join tb_role_menu rm
+                           on ur.role_id=rm.role_id
+                 left join tb_menu m
+                           on m.id=rm.menu_id
+        where
+            ur.user_id=#{userId} AND m.menu_type in('M','C') AND m.del_flag=0
+        order by
+            m.parent_id , m.order_num
+    </select>
+</mapper>
